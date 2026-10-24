@@ -9,7 +9,8 @@ export function createApp(): Express {
   app.disable('x-powered-by');
 
   // Configure CORS for the frontend origin(s)
-  const rawOrigins = process.env.CORS_ORIGIN || 'http://localhost:4200';
+  const rawOrigins =
+    process.env.CORS_ORIGIN || 'http://localhost:4201,http://localhost:4200';
   const allowedOrigins = rawOrigins
     .split(',')
     .map((origin) => origin.trim())

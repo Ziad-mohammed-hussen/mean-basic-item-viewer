@@ -19,7 +19,7 @@ describe('MEAN Stack Basic Item Viewer — Frontend Verification Suite', () => {
 
     it('configures development environment to target local Express API', () => {
       assert.equal(devEnv.production, false);
-      assert.equal(devEnv.apiBaseUrl, 'http://localhost:3000/api');
+      assert.equal(devEnv.apiBaseUrl, 'http://localhost:3001/api');
     });
   });
 

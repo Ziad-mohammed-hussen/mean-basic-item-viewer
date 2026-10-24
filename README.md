@@ -104,9 +104,9 @@ cp backend/.env.example backend/.env
 2. Edit `backend/.env` and supply your real MongoDB Atlas credentials for `khutwa_db`:
 
 ```env
-PORT=3000
+PORT=3001
 NODE_ENV=development
-CORS_ORIGIN=http://localhost:4200
+CORS_ORIGIN=http://localhost:4201,http://localhost:4200
 
 MONGODB_DB_NAME=khutwa_db
 MONGODB_USERNAME=your_actual_mongodb_username
@@ -166,7 +166,7 @@ npm run dev:backend
 cd backend && npm run dev
 ```
 
-The backend API listens on `http://localhost:3000` by default.
+The backend API listens on `http://localhost:3001` by default.
 
 ### 2. Start the Angular Frontend
 
@@ -180,7 +180,7 @@ npm run dev:frontend
 cd frontend && npm start
 ```
 
-Open `http://localhost:4200` in your browser. The Angular app fetches live records from `http://localhost:3000/api/items` via `ItemService`.
+Open `http://localhost:4201` in your browser. The Angular app fetches live records from `http://localhost:3001/api/items` via `ItemService`.
 
 ---
 

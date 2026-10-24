@@ -1,6 +1,9 @@
-import { EnvironmentConfig } from './environment';
+export interface EnvironmentConfig {
+  production: boolean;
+  apiBaseUrl: string;
+}
 
 export const environment: EnvironmentConfig = {
   production: false,
-  apiBaseUrl: 'http://localhost:3000/api',
+  apiBaseUrl: 'http://localhost:3001/api',
 };

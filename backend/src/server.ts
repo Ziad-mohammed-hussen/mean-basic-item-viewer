@@ -7,7 +7,7 @@ import {
   sanitizeLogMessage,
 } from './config/database';
 
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 3001;
 
 async function startServer(): Promise<http.Server> {
   try {
