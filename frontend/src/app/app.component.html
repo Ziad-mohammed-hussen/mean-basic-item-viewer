@@ -1,0 +1,93 @@
+<div class="page-wrapper">
+  <header class="page-header">
+    <div class="header-container">
+      <div class="header-eyebrow">MEAN Stack Application</div>
+      <h1 class="page-title">{{ title }}</h1>
+      <p class="page-subtitle">{{ subtitle }}</p>
+    </div>
+  </header>
+
+  <main class="main-content" id="main-content">
+    <section class="content-container" aria-labelledby="items-section-heading">
+      <div class="section-bar">
+        <h2 id="items-section-heading" class="section-heading">
+          Database Records
+        </h2>
+        @if (!isLoading && !errorMessage) {
+          <span class="record-count" aria-live="polite">
+            {{ items.length }} {{ items.length === 1 ? 'item' : 'items' }}
+          </span>
+        }
+      </div>
+
+      <!-- Loading State -->
+      @if (isLoading) {
+        <div
+          class="state-card loading-state"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <div class="spinner" aria-hidden="true"></div>
+          <p class="state-title">Loading items from database...</p>
+          <p class="state-description">
+            Retrieving current records from the Express API and MongoDB.
+          </p>
+        </div>
+      }
+
+      <!-- Error State -->
+      @else if (errorMessage) {
+        <div class="state-card error-state" role="alert">
+          <div class="error-badge" aria-hidden="true">!</div>
+          <h3 class="state-title">Could Not Load Items</h3>
+          <p class="state-description">{{ errorMessage }}</p>
+          <button
+            type="button"
+            class="retry-button"
+            (click)="fetchItems()"
+          >
+            Retry Request
+          </button>
+        </div>
+      }
+
+      <!-- Empty State -->
+      @else if (items.length === 0) {
+        <div class="state-card empty-state" role="status" aria-live="polite">
+          <h3 class="state-title">No Items Found</h3>
+          <p class="state-description">
+            The database query succeeded, but the MongoDB collection does not
+            currently contain any item records.
+          </p>
+        </div>
+      }
+
+      <!-- Populated Item List -->
+      @else {
+        <ul class="item-list" role="list">
+          @for (item of items; track item._id) {
+            <li class="item-card" tabindex="0">
+              <div class="item-card-header">
+                <h3 class="item-name">{{ item.name }}</h3>
+                @if (item.category) {
+                  <span class="item-category">{{ item.category }}</span>
+                }
+              </div>
+
+              @if (item.description) {
+                <p class="item-description">{{ item.description }}</p>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <div class="footer-container">
+      <span>Basic Item Viewer &middot; Powered by MongoDB, Express, Angular &amp; Node.js</span>
+    </div>
+  </footer>
+</div>
