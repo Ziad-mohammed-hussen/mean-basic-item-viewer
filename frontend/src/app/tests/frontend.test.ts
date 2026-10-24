@@ -126,7 +126,10 @@ describe('MEAN Stack Basic Item Viewer — Frontend Verification Suite', () => {
       assert.equal(component.isLoading, false);
       assert.deepEqual(component.items, []);
       assert.ok(component.errorMessage);
-      assert.ok(component.errorMessage.toLowerCase().includes('mongodb'));
+      assert.ok(
+        component.errorMessage.toLowerCase().includes('database') ||
+          component.errorMessage.toLowerCase().includes('mongodb')
+      );
     });
 
     it('shows friendly error message when backend is unreachable (status 0)', () => {

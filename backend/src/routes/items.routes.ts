@@ -1,5 +1,10 @@
 import { Request, Response, Router } from 'express';
-import { getDatabaseStatus, sanitizeLogMessage } from '../config/database';
+import {
+  ensureDatabaseConnected,
+  getDatabaseStatus,
+  getLastConnectionError,
+  sanitizeLogMessage,
+} from '../config/database';
 import { Item } from '../models/item.model';
 
 export const itemsRouter = Router();
@@ -10,12 +15,26 @@ export const itemsRouter = Router();
  * Read-only endpoint: never returns hardcoded fallback arrays.
  */
 itemsRouter.get('/', async (_req: Request, res: Response): Promise<void> => {
-  const dbStatus = getDatabaseStatus();
+  let dbStatus = getDatabaseStatus();
 
   if (!dbStatus.connected) {
+    await ensureDatabaseConnected();
+    dbStatus = getDatabaseStatus();
+  }
+
+  if (!dbStatus.connected) {
+    const diagnostic = getLastConnectionError();
+    const isConfigIssue =
+      diagnostic &&
+      (diagnostic.includes('placeholder') ||
+        diagnostic.includes('Missing MongoDB configuration') ||
+        diagnostic.includes('backend/.env'));
+
     res.status(503).json({
       error: 'Service Unavailable',
-      message: 'Database connection is not ready. Unable to retrieve items at this time.',
+      message: isConfigIssue
+        ? 'The backend server is running, but MongoDB credentials are not configured yet. Please set your real MONGODB_USERNAME and MONGODB_PASSWORD in backend/.env.'
+        : 'The backend server is running, but the MongoDB database connection is currently unavailable.',
     });
     return;
   }
@@ -34,7 +53,8 @@ itemsRouter.get('/', async (_req: Request, res: Response): Promise<void> => {
 
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'An unexpected error occurred while retrieving items from the database.',
+      message:
+        'An unexpected error occurred while retrieving items from the database.',
     });
   }
 });

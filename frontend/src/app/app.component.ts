@@ -52,11 +52,15 @@ export class AppComponent implements OnInit {
       if (err.status === 0) {
         return 'Unable to reach the backend API server. Please ensure the server is running and accessible.';
       }
+      if (
+        err.error &&
+        typeof err.error.message === 'string' &&
+        err.error.message.trim().length > 0
+      ) {
+        return err.error.message;
+      }
       if (err.status === 503) {
         return 'The backend server is running, but the MongoDB database connection is currently unavailable.';
-      }
-      if (err.error && typeof err.error.message === 'string') {
-        return err.error.message;
       }
     }
     return 'Unable to load items from the database at this time. Please try again shortly.';

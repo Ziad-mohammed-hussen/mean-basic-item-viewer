@@ -1,6 +1,10 @@
 import cors from 'cors';
 import express, { Express, NextFunction, Request, Response } from 'express';
-import { getDatabaseStatus, sanitizeLogMessage } from './config/database';
+import {
+  ensureDatabaseConnected,
+  getDatabaseStatus,
+  sanitizeLogMessage,
+} from './config/database';
 import { itemsRouter } from './routes/items.routes';
 
 export function createApp(): Express {
@@ -71,8 +75,12 @@ export function createApp(): Express {
    * Separate database-readiness check that distinguishes a running server from a connected database.
    * Returns HTTP 200 when connected to MongoDB, or HTTP 503 when disconnected.
    */
-  app.get('/api/health/db', (_req: Request, res: Response) => {
-    const dbStatus = getDatabaseStatus();
+  app.get('/api/health/db', async (_req: Request, res: Response) => {
+    let dbStatus = getDatabaseStatus();
+    if (!dbStatus.connected) {
+      await ensureDatabaseConnected();
+      dbStatus = getDatabaseStatus();
+    }
     const statusCode = dbStatus.connected ? 200 : 503;
 
     res.status(statusCode).json({
@@ -81,6 +89,9 @@ export function createApp(): Express {
         connected: dbStatus.connected,
         state: dbStatus.state,
         dbName: dbStatus.dbName,
+        ...(dbStatus.diagnosticMessage
+          ? { diagnosticMessage: dbStatus.diagnosticMessage }
+          : {}),
       },
       timestamp: new Date().toISOString(),
     });
@@ -107,7 +118,9 @@ export function createApp(): Express {
       return;
     }
 
-    console.error(`[Error] ${sanitizeLogMessage(err.message || 'Unhandled server error')}`);
+    console.error(
+      `[Error] ${sanitizeLogMessage(err.message || 'Unhandled server error')}`
+    );
     res.status(500).json({
       error: 'Internal Server Error',
       message: 'An unexpected error occurred while processing the request.',
